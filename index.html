@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chamada e Formação de Pelotão - CFO2 C</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, "Helvetica Neue", Arial, sans-serif;
+      }
+      .modal-backdrop {
+        transition: opacity 0.3s ease;
+      }
+      .modal-content {
+        transition: transform 0.3s ease;
+      }
+      /* Ajuste para ecrãs pequenos */
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.5rem;
+      }
+      .formation-dot {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #4a5568; /* gray-700 */
+      }
+      .formation-placeholder {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #e2e8f0; /* gray-300 */
+        border: 2px dashed #a0aec0; /* gray-500 */
+      }
+      /* Estilos para o modo de alteração em lote */
+      .batch-mode-controls {
+        display: none;
+      }
+      .batch-mode-active .batch-mode-controls {
+        display: flex;
+      }
+      .cadet-checkbox {
+        display: none;
+      }
+      .batch-mode-active .cadet-checkbox {
+        display: block;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 text-gray-800">
+    <!-- Cabeçalho -->
+    <header class="bg-blue-900 text-white p-4 text-center shadow-md">
+      <h1 class="text-2xl font-bold">CHAMADA PELOTÃO CHARLIE</h1>
+      <p class="text-sm text-yellow-300">Coordenador: Cap PM Condé</p>
+    </header>
+
+    <!-- Resumo da Situação -->
+    <div class="summary bg-gray-200 p-4 sticky top-0 z-10 shadow-sm">
+      <h2 class="text-xl font-bold text-center mb-3">Situação do Pelotão</h2>
+      <div class="summary-grid text-center">
+        <div>
+          <h3 id="summary-total" class="text-2xl font-bold text-blue-800">0</h3>
+          <span class="text-sm text-gray-600">Previstos</span>
+        </div>
+        <div>
+          <h3 id="summary-present" class="text-2xl font-bold text-green-600">
+            0
+          </h3>
+          <span class="text-sm text-gray-600">Em Forma</span>
+        </div>
+        <div>
+          <h3
+            id="summary-excused-in"
+            class="text-2xl font-bold text-yellow-600"
+          >
+            0
+          </h3>
+          <span class="text-sm text-gray-600">Fora (APM)</span>
+        </div>
+        <div>
+          <h3
+            id="summary-excused-out"
+            class="text-2xl font-bold text-purple-600"
+          >
+            0
+          </h3>
+          <span class="text-sm text-gray-600">Fora (Fora)</span>
+        </div>
+        <div>
+          <h3 id="summary-hearing" class="text-2xl font-bold text-indigo-600">
+            0
+          </h3>
+          <span class="text-sm text-gray-600">Audiências</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Container Principal -->
+    <div class="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
+      <!-- Coluna da Lista de Cadetes -->
+      <main id="main-content" class="lg:col-span-2">
+        <div class="flex justify-end mb-2">
+          <button
+            id="batch-mode-button"
+            class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-md shadow-sm"
+          >
+            Alterar em Lote
+          </button>
+        </div>
+        <!-- Controles de Ação em Lote -->
+        <div
+          class="batch-mode-controls bg-blue-100 p-3 rounded-lg mb-2 items-center gap-2 flex-wrap"
+        >
+          <select
+            id="batch-status-select"
+            class="p-2 border border-gray-300 rounded-md"
+          >
+            <option value="em_forma">Em Forma</option>
+            <option value="fora_de_forma_apm">Fora (APM)</option>
+            <option value="fora_de_forma_fora_apm">Fora (Fora)</option>
+            <option value="audiencia">Audiência</option>
+          </select>
+          <input
+            id="batch-reason-input"
+            type="text"
+            placeholder="Motivo para todos"
+            class="flex-grow p-2 border border-gray-300 rounded-md"
+          />
+          <button
+            id="apply-batch-button"
+            class="bg-blue-600 text-white p-2 rounded-md font-semibold"
+          >
+            Aplicar a Selecionados
+          </button>
+          <button
+            id="cancel-batch-button"
+            class="bg-gray-500 text-white p-2 rounded-md font-semibold"
+          >
+            Cancelar
+          </button>
+        </div>
+        <ul
+          id="cadet-list"
+          class="bg-white rounded-lg shadow-md overflow-hidden"
+        >
+          <!-- Itens da lista gerados por JS -->
+        </ul>
+      </main>
+
+      <!-- Coluna da Formação e Relatório -->
+      <aside class="space-y-4">
+        <!-- Desenho do Pelotão -->
+        <section class="bg-white p-4 rounded-lg shadow-md">
+          <h3 class="font-bold text-lg border-b pb-2 mb-3 text-center">
+            Desenho do Pelotão em Forma
+          </h3>
+          <div id="formation-drawing" class="flex flex-col items-center">
+            <!-- O desenho será gerado aqui -->
+          </div>
+          <p
+            id="formation-summary"
+            class="text-center text-sm text-gray-600 mt-3"
+          ></p>
+        </section>
+
+        <!-- Seção de Relatório -->
+        <section class="bg-white p-4 rounded-lg shadow-md">
+          <button
+            id="report-button"
+            class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
+          >
+            Gerar Relatório do Dia
+          </button>
+          <div
+            id="report-output"
+            class="mt-4 p-4 border border-gray-200 rounded-lg text-left whitespace-pre-wrap hidden"
+          >
+            <h4 class="font-bold text-md border-b pb-2 mb-2">
+              Relatório Gerado:
+            </h4>
+            <div id="report-content"></div>
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <!-- Modal para Justificativa -->
+    <div
+      id="reason-modal"
+      class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden"
+    >
+      <div
+        class="modal-content bg-white rounded-lg shadow-2xl p-6 w-full max-w-lg transform scale-95"
+        onclick="event.stopPropagation()"
+      >
+        <h3 class="text-xl font-bold text-blue-900 mb-2">
+          Adicionar Justificativa
+        </h3>
+        <p class="mb-4">
+          Para: <span id="reason-cadet-name" class="font-semibold"></span>
+        </p>
+        <textarea
+          id="reason-input"
+          class="w-full p-2 border border-gray-300 rounded-md h-32"
+          placeholder="Insira os detalhes da missão, audiência, etc."
+        ></textarea>
+        <div class="mt-4 flex justify-end space-x-2">
+          <button
+            onclick="closeReasonModal()"
+            class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg"
+          >
+            Cancelar
+          </button>
+          <button
+            id="save-reason-button"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
+          >
+            Salvar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // --- ELEMENTOS DO DOM ---
+        const listElement = document.getElementById("cadet-list");
+        const reportButton = document.getElementById("report-button");
+        const reportOutput = document.getElementById("report-output");
+        const reportContent = document.getElementById("report-content");
+        const reasonModal = document.getElementById("reason-modal");
+        const reasonCadetName = document.getElementById("reason-cadet-name");
+        const reasonInput = document.getElementById("reason-input");
+        const saveReasonButton = document.getElementById("save-reason-button");
+        const formationDrawing = document.getElementById("formation-drawing");
+        const formationSummary = document.getElementById("formation-summary");
+        const mainContent = document.getElementById("main-content");
+        const batchModeButton = document.getElementById("batch-mode-button");
+        const applyBatchButton = document.getElementById("apply-batch-button");
+        const cancelBatchButton = document.getElementById(
+          "cancel-batch-button"
+        );
+        const batchStatusSelect = document.getElementById(
+          "batch-status-select"
+        );
+        const batchReasonInput = document.getElementById("batch-reason-input");
+
+        // --- DADOS E ESTADO INICIAL ---
+        const initialCadets = [
+          "ANA CAROLINA",
+          "VIEIRA",
+          "MEDINA",
+          "ARNON",
+          "BRUNO DANTAS",
+          "CARLOS LANA",
+          "NESTOR",
+          "DINEY",
+          "VICTOR",
+          "EDER MONTEIRO",
+          "SOARES",
+          "DORNELAS",
+          "EDUARDO DIAS",
+          "EDUARDO",
+          "MARQUES",
+          "FELIPE",
+          "AMORIM",
+          "OLIVEIRA LOPES",
+          "HELOYANA",
+          "IGOR",
+          "BARCELOS",
+          "RENATO",
+          "LEANDRO",
+          "LUAN",
+          "PAULO PIMENTA",
+          "OLIVEIRA COSTA",
+          "MAURO",
+          "NÚBIA",
+          "NAZARIO",
+          "HORTA",
+          "GUIMARÃES",
+          "FELICIA",
+          "SARA",
+          "LINHARES",
+        ];
+
+        let cadetData = initialCadets.map((name) => ({
+          name: name,
+          status: "em_forma", // 'em_forma', 'fora_de_forma_apm', 'fora_de_forma_fora_apm', 'audiencia'
+          reason: "",
+        }));
+
+        let currentEditingIndex = -1;
+        let currentStatusToSet = "";
+
+        // --- FUNÇÕES DE ATUALIZAÇÃO E RENDERIZAÇÃO ---
+
+        function updateAll() {
+          updateCounters();
+          renderCadetList();
+          renderFormation();
+        }
+
+        function updateCounters() {
+          const counts = cadetData.reduce((acc, cadet) => {
+            acc[cadet.status] = (acc[cadet.status] || 0) + 1;
+            return acc;
+          }, {});
+
+          document.getElementById("summary-total").textContent =
+            cadetData.length;
+          document.getElementById("summary-present").textContent =
+            counts.em_forma || 0;
+          document.getElementById("summary-excused-in").textContent =
+            counts.fora_de_forma_apm || 0;
+          document.getElementById("summary-excused-out").textContent =
+            counts.fora_de_forma_fora_apm || 0;
+          document.getElementById("summary-hearing").textContent =
+            counts.audiencia || 0;
+        }
+
+        function renderCadetList() {
+          listElement.innerHTML = "";
+          cadetData.forEach((cadet, index) => {
+            const listItem = document.createElement("li");
+            listItem.className =
+              "flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 border-b border-gray-200 last:border-b-0 hover:bg-gray-50";
+
+            const leftSide = document.createElement("div");
+            leftSide.className = "flex items-center w-full sm:w-auto";
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.className = "cadet-checkbox h-5 w-5 mr-3 flex-shrink-0";
+            checkbox.dataset.index = index;
+            leftSide.appendChild(checkbox);
+
+            const nameDiv = document.createElement("div");
+            nameDiv.className = "pr-2";
+            const nameSpan = document.createElement("span");
+            nameSpan.className = "cadet-name text-md font-medium";
+            nameSpan.textContent = `${index + 1}. ${cadet.name}`;
+            nameDiv.appendChild(nameSpan);
+
+            if (cadet.reason) {
+              const reasonP = document.createElement("p");
+              reasonP.className = "text-xs text-gray-500 mt-1 italic";
+              reasonP.textContent = `Motivo: ${cadet.reason}`;
+              nameDiv.appendChild(reasonP);
+            }
+            leftSide.appendChild(nameDiv);
+
+            const controlsDiv = document.createElement("div");
+            controlsDiv.className =
+              "flex items-center space-x-1 flex-shrink-0 flex-wrap gap-y-1 mt-2 sm:mt-0";
+
+            const statuses = [
+              { id: "em_forma", text: "Em Forma", color: "green" },
+              { id: "fora_de_forma_apm", text: "Fora (APM)", color: "yellow" },
+              {
+                id: "fora_de_forma_fora_apm",
+                text: "Fora (Fora)",
+                color: "purple",
+              },
+              { id: "audiencia", text: "Audiência", color: "indigo" },
+            ];
+
+            statuses.forEach((s) => {
+              const btn = document.createElement("button");
+              const isActive = cadet.status === s.id;
+              btn.textContent = s.text;
+              btn.className = `text-xs font-bold py-2 px-2 rounded-md transition-colors shadow-sm ${
+                isActive
+                  ? `bg-${s.color}-600 text-white`
+                  : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+              }`;
+              btn.onclick = () => changeStatus(index, s.id);
+              controlsDiv.appendChild(btn);
+            });
+
+            listItem.appendChild(leftSide);
+            listItem.appendChild(controlsDiv);
+            listElement.appendChild(listItem);
+          });
+        }
+
+        function changeStatus(index, newStatus) {
+          const needsReason = [
+            "fora_de_forma_apm",
+            "fora_de_forma_fora_apm",
+            "audiencia",
+          ];
+          cadetData[index].status = newStatus;
+
+          if (needsReason.includes(newStatus)) {
+            openReasonModal(index, newStatus);
+          } else {
+            cadetData[index].reason = "";
+            updateAll();
+          }
+        }
+
+        function renderFormation() {
+          formationDrawing.innerHTML = "";
+          const numPresentes = cadetData.filter(
+            (c) => c.status === "em_forma"
+          ).length;
+
+          if (numPresentes === 0) {
+            formationSummary.textContent = "Nenhum cadete em forma.";
+            return;
+          }
+
+          const temXerife = numPresentes >= 1;
+          const numPelotao = temXerife ? numPresentes - 1 : 0;
+
+          if (temXerife) {
+            const xerifeContainer = document.createElement("div");
+            xerifeContainer.className = "flex justify-center mb-4";
+            const dot = document.createElement("div");
+            dot.className = "formation-dot";
+            xerifeContainer.appendChild(dot);
+            formationDrawing.appendChild(xerifeContainer);
+          }
+
+          const platoonContainer = document.createElement("div");
+          platoonContainer.className = "flex justify-center space-x-4";
+          formationDrawing.appendChild(platoonContainer);
+
+          if (numPelotao > 0) {
+            const numColunas = 3;
+            const numLinhas = Math.ceil(numPelotao / numColunas);
+            let cadetesRestantes = numPelotao;
+
+            for (let i = 0; i < numColunas; i++) {
+              const colDiv = document.createElement("div");
+              colDiv.className = "flex flex-col items-center space-y-2";
+              const cadetesNestaColuna =
+                cadetesRestantes > 0
+                  ? Math.ceil(cadetesRestantes / (numColunas - i))
+                  : 0;
+
+              for (let j = 0; j < numLinhas; j++) {
+                const dot = document.createElement("div");
+                if (j < cadetesNestaColuna) {
+                  dot.className = "formation-dot";
+                } else {
+                  dot.className = "formation-placeholder";
+                }
+                colDiv.appendChild(dot);
+              }
+              cadetesRestantes -= cadetesNestaColuna;
+              platoonContainer.appendChild(colDiv);
+            }
+
+            const cadetesUltimaLinha = numPelotao % numColunas;
+            const retaguardaCompleta =
+              cadetesUltimaLinha === 0 || numLinhas === 1;
+            const textoRetaguarda = retaguardaCompleta
+              ? "completa"
+              : `com ${cadetesUltimaLinha} cadete(s)`;
+
+            formationSummary.textContent = `Xerife à frente. Pelotão com ${numLinhas} linha(s). Retaguarda ${textoRetaguarda}.`;
+          } else if (temXerife) {
+            formationSummary.textContent = "Apenas o Xerife está em forma.";
+          }
+        }
+
+        // --- MODAL DE JUSTIFICATIVA ---
+        function openReasonModal(index, status) {
+          currentEditingIndex = index;
+          currentStatusToSet = status;
+          reasonCadetName.textContent = cadetData[index].name;
+          reasonInput.value = "";
+          reasonModal.classList.remove("hidden");
+        }
+
+        window.closeReasonModal = function () {
+          reasonModal.classList.add("hidden");
+          if (
+            currentEditingIndex > -1 &&
+            !cadetData[currentEditingIndex].reason
+          ) {
+            cadetData[currentEditingIndex].status = "em_forma";
+          }
+          updateAll();
+        };
+
+        function saveReason() {
+          if (currentEditingIndex > -1) {
+            cadetData[currentEditingIndex].status = currentStatusToSet;
+            cadetData[currentEditingIndex].reason = reasonInput.value;
+            reasonModal.classList.add("hidden");
+            updateAll();
+          }
+        }
+
+        // --- GERAÇÃO DE RELATÓRIO LOCAL ---
+        function generateReport() {
+          const presentCount = cadetData.filter(
+            (c) => c.status === "em_forma"
+          ).length;
+          const lists = {
+            fora_de_forma_apm: [],
+            fora_de_forma_fora_apm: [],
+            audiencia: [],
+          };
+
+          cadetData.forEach((cadet) => {
+            if (lists[cadet.status]) {
+              lists[cadet.status].push({
+                name: cadet.name,
+                reason: cadet.reason,
+              });
+            }
+          });
+
+          let reportString = `➖➖ CFO2 C ➖➖\n`;
+          reportString += `◼Previstos: ${cadetData.length}\n`;
+          reportString += `◼Presentes: ${presentCount}\n`;
+
+          function formatList(title, category, showCount = true) {
+            let section = showCount
+              ? `${title}: ${lists[category].length}\n`
+              : `${title}\n`;
+            if (lists[category].length > 0) {
+              lists[category].forEach((cadet, index) => {
+                section += `${index + 1} - CAD PM ${cadet.name} (${
+                  cadet.reason
+                })\n`;
+              });
+            }
+            return section;
+          }
+
+          reportString += formatList(
+            "◼Fora de forma (na APM)",
+            "fora_de_forma_apm"
+          );
+          reportString += formatList(
+            "◼Fora de forma (da APM)",
+            "fora_de_forma_fora_apm"
+          );
+          reportString += formatList("* Audiências", "audiencia", false);
+
+          reportContent.textContent = reportString.trim();
+          reportOutput.classList.remove("hidden");
+        }
+
+        // --- LÓGICA DE ALTERAÇÃO EM LOTE ---
+        function toggleBatchMode() {
+          mainContent.classList.toggle("batch-mode-active");
+        }
+
+        function applyBatchChange() {
+          const newStatus = batchStatusSelect.value;
+          const newReason = batchReasonInput.value;
+          const selectedCheckboxes = document.querySelectorAll(
+            ".cadet-checkbox:checked"
+          );
+
+          if (selectedCheckboxes.length === 0) {
+            alert("Por favor, selecione pelo menos um cadete.");
+            return;
+          }
+
+          selectedCheckboxes.forEach((checkbox) => {
+            const index = parseInt(checkbox.dataset.index, 10);
+            cadetData[index].status = newStatus;
+            cadetData[index].reason = newReason;
+          });
+
+          toggleBatchMode();
+          updateAll();
+        }
+
+        // --- EVENT LISTENERS ---
+        reportButton.addEventListener("click", generateReport);
+        saveReasonButton.addEventListener("click", saveReason);
+        batchModeButton.addEventListener("click", toggleBatchMode);
+        cancelBatchButton.addEventListener("click", toggleBatchMode);
+        applyBatchButton.addEventListener("click", applyBatchChange);
+
+        // --- INICIALIZAÇÃO ---
+        updateAll();
+      });
+    </script>
+  </body>
+</html>
