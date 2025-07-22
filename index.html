@@ -30,7 +30,6 @@
       }
       .summary-grid {
         display: grid;
-        /* Ajuste para ecrãs pequenos para ser mais compacto */
         grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
         gap: 0.25rem;
       }
@@ -151,13 +150,13 @@
         <div class="flex flex-wrap gap-2 justify-end mb-2">
           <button
             id="mark-all-present-button"
-            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md shadow-sm"
+            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 text-sm rounded-md shadow-sm"
           >
             Marcar Todos em Forma
           </button>
           <button
             id="batch-mode-button"
-            class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-md shadow-sm"
+            class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 text-sm rounded-md shadow-sm"
           >
             Alterar em Lote
           </button>
@@ -168,7 +167,7 @@
         >
           <select
             id="batch-status-select"
-            class="p-2 border border-gray-300 rounded-md"
+            class="p-2 border border-gray-300 rounded-md text-sm"
           >
             <option value="nao_preenchido">Não Preenchido</option>
             <option value="em_forma">Em Forma</option>
@@ -180,17 +179,17 @@
             id="batch-reason-input"
             type="text"
             placeholder="Motivo para todos"
-            class="flex-grow p-2 border border-gray-300 rounded-md"
+            class="flex-grow p-2 border border-gray-300 rounded-md text-sm"
           />
           <button
             id="apply-batch-button"
-            class="bg-blue-600 text-white p-2 rounded-md font-semibold"
+            class="bg-blue-600 text-white p-2 rounded-md font-semibold text-sm"
           >
-            Aplicar a Selecionados
+            Aplicar
           </button>
           <button
             id="cancel-batch-button"
-            class="bg-gray-500 text-white p-2 rounded-md font-semibold"
+            class="bg-gray-500 text-white p-2 rounded-md font-semibold text-sm"
           >
             Cancelar
           </button>
@@ -396,7 +395,8 @@
               "flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 border-b border-gray-200 last:border-b-0 hover:bg-gray-50";
 
             const leftSide = document.createElement("div");
-            leftSide.className = "flex items-center w-full sm:w-auto";
+            leftSide.className =
+              "flex items-center w-full sm:w-auto mb-2 sm:mb-0";
 
             const checkbox = document.createElement("input");
             checkbox.type = "checkbox";
@@ -421,7 +421,7 @@
 
             const controlsDiv = document.createElement("div");
             controlsDiv.className =
-              "flex items-center space-x-1 flex-shrink-0 flex-wrap gap-y-1 mt-2 sm:mt-0";
+              "flex items-center space-x-1 flex-shrink-0 flex-wrap gap-y-1";
 
             const statuses = [
               { id: "nao_preenchido", text: "Não Preenchido", color: "gray" },
@@ -439,7 +439,8 @@
               const btn = document.createElement("button");
               const isActive = cadet.status === s.id;
               btn.textContent = s.text;
-              btn.className = `text-xs font-bold py-2 px-2 rounded-md transition-colors shadow-sm ${
+              // Botões mais compactos
+              btn.className = `text-xs font-semibold py-1 px-2 rounded-md transition-colors shadow-sm ${
                 isActive
                   ? `bg-${s.color}-600 text-white`
                   : "bg-gray-200 hover:bg-gray-300 text-gray-700"
