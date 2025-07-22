@@ -30,8 +30,9 @@
       }
       .summary-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 0.5rem;
+        /* Ajuste para ecrãs pequenos para ser mais compacto */
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 0.25rem;
       }
       .formation-dot {
         width: 20px;
@@ -71,57 +72,74 @@
         src="https://www.pmmg.mg.gov.br/site/includes/images/logo-pmmg-novo.png"
         alt="Logo PMMG"
         class="h-12"
+        onerror="this.style.display='none'"
       />
       <h1 class="text-xl sm:text-2xl font-bold" style="color: var(--pmmg-gold)">
-        TURMA CHARLIE
+        CHAMADA PELOTÃO CHARLIE
       </h1>
       <div class="w-12"></div>
       <!-- Espaçador -->
     </header>
 
     <!-- Resumo da Situação -->
-    <div class="summary bg-gray-200 p-4 sticky top-0 z-10 shadow-sm">
-      <h2 class="text-xl font-bold text-center mb-3">Situação do Pelotão</h2>
+    <div class="summary bg-gray-200 p-2 sm:p-4 sticky top-0 z-10 shadow-sm">
+      <h2 class="text-lg sm:text-xl font-bold text-center mb-2">
+        Situação do Pelotão
+      </h2>
       <div class="summary-grid text-center">
         <div>
-          <h3 id="summary-total" class="text-2xl font-bold text-blue-800">0</h3>
-          <span class="text-sm text-gray-600">Previstos</span>
-        </div>
-        <div>
-          <h3 id="summary-unfilled" class="text-2xl font-bold text-gray-500">
+          <h3
+            id="summary-total"
+            class="text-xl sm:text-2xl font-bold text-blue-800"
+          >
             0
           </h3>
-          <span class="text-sm text-gray-600">Não Preenchido</span>
+          <span class="text-xs sm:text-sm text-gray-600">Previstos</span>
         </div>
         <div>
-          <h3 id="summary-present" class="text-2xl font-bold text-green-600">
+          <h3
+            id="summary-unfilled"
+            class="text-xl sm:text-2xl font-bold text-gray-500"
+          >
             0
           </h3>
-          <span class="text-sm text-gray-600">Em Forma</span>
+          <span class="text-xs sm:text-sm text-gray-600">Não Preenchido</span>
+        </div>
+        <div>
+          <h3
+            id="summary-present"
+            class="text-xl sm:text-2xl font-bold text-green-600"
+          >
+            0
+          </h3>
+          <span class="text-xs sm:text-sm text-gray-600">Em Forma</span>
         </div>
         <div>
           <h3
             id="summary-excused-in"
-            class="text-2xl font-bold text-yellow-600"
+            class="text-xl sm:text-2xl font-bold text-yellow-600"
           >
             0
           </h3>
-          <span class="text-sm text-gray-600">Fora (APM)</span>
+          <span class="text-xs sm:text-sm text-gray-600">Fora (APM)</span>
         </div>
         <div>
           <h3
             id="summary-excused-out"
-            class="text-2xl font-bold text-purple-600"
+            class="text-xl sm:text-2xl font-bold text-purple-600"
           >
             0
           </h3>
-          <span class="text-sm text-gray-600">Fora (Fora)</span>
+          <span class="text-xs sm:text-sm text-gray-600">Fora (Fora)</span>
         </div>
         <div>
-          <h3 id="summary-hearing" class="text-2xl font-bold text-indigo-600">
+          <h3
+            id="summary-hearing"
+            class="text-xl sm:text-2xl font-bold text-indigo-600"
+          >
             0
           </h3>
-          <span class="text-sm text-gray-600">Audiências</span>
+          <span class="text-xs sm:text-sm text-gray-600">Audiências</span>
         </div>
       </div>
     </div>
