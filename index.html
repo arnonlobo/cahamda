@@ -3,16 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chamada e Formação de Pelotão - CFO2 C</title>
+    <title>Chamada e Formação de Pelotão - PMMG</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <style>
+      /* Cores PMMG */
+      :root {
+        --pmmg-dark: #212529;
+        --pmmg-gold: #c5a364;
+        --pmmg-background: #f8f9fa;
+        --pmmg-content-bg: #ffffff;
+      }
       body {
         font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
           Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: var(--pmmg-background);
       }
       .modal-backdrop {
         transition: opacity 0.3s ease;
@@ -20,7 +28,6 @@
       .modal-content {
         transition: transform 0.3s ease;
       }
-      /* Ajuste para ecrãs pequenos */
       .summary-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -30,14 +37,14 @@
         width: 20px;
         height: 20px;
         border-radius: 50%;
-        background-color: #4a5568; /* gray-700 */
+        background-color: var(--pmmg-dark);
       }
       .formation-placeholder {
         width: 20px;
         height: 20px;
         border-radius: 50%;
-        background-color: #e2e8f0; /* gray-300 */
-        border: 2px dashed #a0aec0; /* gray-500 */
+        background-color: #e9ecef;
+        border: 2px dashed #adb5bd;
       }
       /* Estilos para o modo de alteração em lote */
       .batch-mode-controls {
@@ -54,11 +61,22 @@
       }
     </style>
   </head>
-  <body class="bg-gray-100 text-gray-800">
+  <body class="text-gray-800">
     <!-- Cabeçalho -->
-    <header class="bg-blue-900 text-white p-4 text-center shadow-md">
-      <h1 class="text-2xl font-bold">CHAMADA PELOTÃO CHARLIE</h1>
-      <p class="text-sm text-yellow-300">Coordenador: Cap PM Condé</p>
+    <header
+      class="p-3 text-center shadow-md flex items-center justify-between"
+      style="background-color: var(--pmmg-dark)"
+    >
+      <img
+        src="https://www.pmmg.mg.gov.br/site/includes/images/logo-pmmg-novo.png"
+        alt="Logo PMMG"
+        class="h-12"
+      />
+      <h1 class="text-xl sm:text-2xl font-bold" style="color: var(--pmmg-gold)">
+        CHAMADA PELOTÃO CHARLIE
+      </h1>
+      <div class="w-12"></div>
+      <!-- Espaçador -->
     </header>
 
     <!-- Resumo da Situação -->
@@ -68,6 +86,12 @@
         <div>
           <h3 id="summary-total" class="text-2xl font-bold text-blue-800">0</h3>
           <span class="text-sm text-gray-600">Previstos</span>
+        </div>
+        <div>
+          <h3 id="summary-unfilled" class="text-2xl font-bold text-gray-500">
+            0
+          </h3>
+          <span class="text-sm text-gray-600">Não Preenchido</span>
         </div>
         <div>
           <h3 id="summary-present" class="text-2xl font-bold text-green-600">
@@ -106,7 +130,13 @@
     <div class="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
       <!-- Coluna da Lista de Cadetes -->
       <main id="main-content" class="lg:col-span-2">
-        <div class="flex justify-end mb-2">
+        <div class="flex flex-wrap gap-2 justify-end mb-2">
+          <button
+            id="mark-all-present-button"
+            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md shadow-sm"
+          >
+            Marcar Todos em Forma
+          </button>
           <button
             id="batch-mode-button"
             class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-md shadow-sm"
@@ -122,6 +152,7 @@
             id="batch-status-select"
             class="p-2 border border-gray-300 rounded-md"
           >
+            <option value="nao_preenchido">Não Preenchido</option>
             <option value="em_forma">Em Forma</option>
             <option value="fora_de_forma_apm">Fora (APM)</option>
             <option value="fora_de_forma_fora_apm">Fora (Fora)</option>
@@ -148,7 +179,8 @@
         </div>
         <ul
           id="cadet-list"
-          class="bg-white rounded-lg shadow-md overflow-hidden"
+          class="rounded-lg shadow-md overflow-hidden"
+          style="background-color: var(--pmmg-content-bg)"
         >
           <!-- Itens da lista gerados por JS -->
         </ul>
@@ -157,7 +189,10 @@
       <!-- Coluna da Formação e Relatório -->
       <aside class="space-y-4">
         <!-- Desenho do Pelotão -->
-        <section class="bg-white p-4 rounded-lg shadow-md">
+        <section
+          class="p-4 rounded-lg shadow-md"
+          style="background-color: var(--pmmg-content-bg)"
+        >
           <h3 class="font-bold text-lg border-b pb-2 mb-3 text-center">
             Desenho do Pelotão em Forma
           </h3>
@@ -171,10 +206,14 @@
         </section>
 
         <!-- Seção de Relatório -->
-        <section class="bg-white p-4 rounded-lg shadow-md">
+        <section
+          class="p-4 rounded-lg shadow-md space-y-3"
+          style="background-color: var(--pmmg-content-bg)"
+        >
           <button
             id="report-button"
-            class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
+            class="w-full text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
+            style="background-color: var(--pmmg-dark); color: var(--pmmg-gold)"
           >
             Gerar Relatório do Dia
           </button>
@@ -191,13 +230,14 @@
       </aside>
     </div>
 
-    <!-- Modal para Justificativa -->
+    <!-- Modal para Justificativa Individual -->
     <div
       id="reason-modal"
       class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden"
     >
       <div
-        class="modal-content bg-white rounded-lg shadow-2xl p-6 w-full max-w-lg transform scale-95"
+        class="modal-content rounded-lg shadow-2xl p-6 w-full max-w-lg transform scale-95"
+        style="background-color: var(--pmmg-content-bg)"
         onclick="event.stopPropagation()"
       >
         <h3 class="text-xl font-bold text-blue-900 mb-2">
@@ -251,6 +291,9 @@
           "batch-status-select"
         );
         const batchReasonInput = document.getElementById("batch-reason-input");
+        const markAllPresentButton = document.getElementById(
+          "mark-all-present-button"
+        );
 
         // --- DADOS E ESTADO INICIAL ---
         const initialCadets = [
@@ -292,7 +335,7 @@
 
         let cadetData = initialCadets.map((name) => ({
           name: name,
-          status: "em_forma", // 'em_forma', 'fora_de_forma_apm', 'fora_de_forma_fora_apm', 'audiencia'
+          status: "nao_preenchido", // 'nao_preenchido', 'em_forma', 'fora_de_forma_apm', 'fora_de_forma_fora_apm', 'audiencia'
           reason: "",
         }));
 
@@ -315,6 +358,8 @@
 
           document.getElementById("summary-total").textContent =
             cadetData.length;
+          document.getElementById("summary-unfilled").textContent =
+            counts.nao_preenchido || 0;
           document.getElementById("summary-present").textContent =
             counts.em_forma || 0;
           document.getElementById("summary-excused-in").textContent =
@@ -361,6 +406,7 @@
               "flex items-center space-x-1 flex-shrink-0 flex-wrap gap-y-1 mt-2 sm:mt-0";
 
             const statuses = [
+              { id: "nao_preenchido", text: "Não Preenchido", color: "gray" },
               { id: "em_forma", text: "Em Forma", color: "green" },
               { id: "fora_de_forma_apm", text: "Fora (APM)", color: "yellow" },
               {
@@ -472,7 +518,7 @@
           }
         }
 
-        // --- MODAL DE JUSTIFICATIVA ---
+        // --- MODAIS ---
         function openReasonModal(index, status) {
           currentEditingIndex = index;
           currentStatusToSet = status;
@@ -487,7 +533,7 @@
             currentEditingIndex > -1 &&
             !cadetData[currentEditingIndex].reason
           ) {
-            cadetData[currentEditingIndex].status = "em_forma";
+            cadetData[currentEditingIndex].status = "nao_preenchido";
           }
           updateAll();
         };
@@ -553,7 +599,7 @@
           reportOutput.classList.remove("hidden");
         }
 
-        // --- LÓGICA DE ALTERAÇÃO EM LOTE ---
+        // --- LÓGICA DE AÇÕES RÁPIDAS ---
         function toggleBatchMode() {
           mainContent.classList.toggle("batch-mode-active");
         }
@@ -580,12 +626,21 @@
           updateAll();
         }
 
+        function markAllInShape() {
+          cadetData.forEach((cadet) => {
+            cadet.status = "em_forma";
+            cadet.reason = "";
+          });
+          updateAll();
+        }
+
         // --- EVENT LISTENERS ---
         reportButton.addEventListener("click", generateReport);
         saveReasonButton.addEventListener("click", saveReason);
         batchModeButton.addEventListener("click", toggleBatchMode);
         cancelBatchButton.addEventListener("click", toggleBatchMode);
         applyBatchButton.addEventListener("click", applyBatchChange);
+        markAllPresentButton.addEventListener("click", markAllInShape);
 
         // --- INICIALIZAÇÃO ---
         updateAll();
