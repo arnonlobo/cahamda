@@ -61,6 +61,13 @@
         background-color: var(--pmmg-dark);
         color: var(--pmmg-gold);
       }
+      #status-indicator {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        color: white;
+        font-weight: bold;
+        text-align: center;
+      }
     </style>
   </head>
   <body class="text-gray-800">
@@ -244,6 +251,14 @@
 
       <!-- Coluna da Formação e Relatório -->
       <aside class="space-y-4">
+        <!-- Status de Conexão -->
+        <section
+          class="p-4 rounded-lg shadow-md"
+          style="background-color: var(--pmmg-content-bg)"
+        >
+          <div id="status-indicator">A carregar...</div>
+        </section>
+
         <!-- Desenho do Pelotão -->
         <section
           class="p-4 rounded-lg shadow-md"
@@ -323,7 +338,11 @@
     </div>
 
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
+      document.addEventListener("DOMContentLoaded", async function () {
+        // --- CONFIGURAÇÃO DO SERVIDOR ---
+        // !!! IMPORTANTE: URL do seu servidor VPS !!!
+        const backendUrl = "http://38.242.129.162:8081";
+
         // --- ELEMENTOS DO DOM ---
         const listElement = document.getElementById("cadet-list");
         const reportButton = document.getElementById("report-button");
@@ -357,6 +376,7 @@
         const copyRollcallButton = document.getElementById(
           "copy-rollcall-button"
         );
+        const statusIndicator = document.getElementById("status-indicator");
 
         // --- DADOS E ESTADO INICIAL ---
         const initialCadets = [
@@ -413,47 +433,87 @@
         let cadetData = [];
         let activeRollCall = "chamada";
         let currentEditingIndex = -1;
+        let saveTimeout;
 
-        // --- FUNÇÕES DE PERSISTÊNCIA (localStorage) ---
-        function saveState() {
-          try {
-            localStorage.setItem(
-              "pmm_charlie_rollcall",
-              JSON.stringify({ cadetData, activeRollCall })
-            );
-          } catch (error) {
-            console.error("Erro ao salvar no localStorage:", error);
+        // --- FUNÇÕES DE PERSISTÊNCIA (BACKEND) ---
+        function updateStatusIndicator(status, message) {
+          switch (status) {
+            case "loading":
+              statusIndicator.style.backgroundColor = "#60a5fa"; // blue-400
+              statusIndicator.textContent = message || "A carregar dados...";
+              break;
+            case "success":
+              statusIndicator.style.backgroundColor = "#4ade80"; // green-400
+              statusIndicator.textContent = message || "Dados salvos!";
+              break;
+            case "error":
+              statusIndicator.style.backgroundColor = "#f87171"; // red-400
+              statusIndicator.textContent = message || "Erro de conexão!";
+              break;
+            case "saving":
+              statusIndicator.style.backgroundColor = "#facc15"; // yellow-400
+              statusIndicator.textContent = message || "A salvar...";
+              break;
           }
         }
 
-        function loadState() {
-          const savedState = localStorage.getItem("pmm_charlie_rollcall");
-          if (savedState) {
+        async function saveState() {
+          clearTimeout(saveTimeout);
+          updateStatusIndicator("saving");
+          saveTimeout = setTimeout(async () => {
             try {
-              const state = JSON.parse(savedState);
-              if (state && state.cadetData && Array.isArray(state.cadetData)) {
-                cadetData = state.cadetData;
-                activeRollCall = state.activeRollCall || "chamada";
-              } else {
-                resetDataLocally();
-              }
+              const response = await fetch(`${backendUrl}/api/data`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ cadetData, activeRollCall }),
+              });
+              if (!response.ok) throw new Error("Falha ao salvar os dados.");
+              updateStatusIndicator("success");
             } catch (error) {
-              console.error(
-                "Erro ao processar dados do localStorage, resetando para o padrão.",
-                error
-              );
-              resetDataLocally();
+              console.error("Erro ao salvar estado:", error);
+              updateStatusIndicator("error");
             }
-          } else {
+          }, 1000); // Aguarda 1 segundo após a última alteração para salvar
+        }
+
+        async function loadState() {
+          updateStatusIndicator("loading");
+          try {
+            const response = await fetch(`${backendUrl}/api/data`);
+            if (!response.ok)
+              throw new Error("Nenhum dado encontrado no servidor.");
+
+            const state = await response.json();
+            cadetData = state.cadetData;
+            activeRollCall = state.activeRollCall || "chamada";
+            updateStatusIndicator("success", "Dados carregados!");
+          } catch (error) {
+            console.warn(
+              "Não foi possível carregar do servidor, a usar dados iniciais:",
+              error
+            );
+            updateStatusIndicator(
+              "error",
+              "Falha ao carregar. A usar dados locais."
+            );
             resetDataLocally();
           }
         }
 
-        function resetData() {
-          // A função confirm() pode ser bloqueada, então o reset é direto.
-          localStorage.removeItem("pmm_charlie_rollcall");
-          loadState();
-          updateAll();
+        async function resetData() {
+          updateStatusIndicator("loading", "A resetar...");
+          try {
+            const response = await fetch(`${backendUrl}/api/reset`, {
+              method: "POST",
+            });
+            if (!response.ok)
+              throw new Error("Falha ao resetar os dados no servidor.");
+            await loadState();
+            updateAll();
+          } catch (error) {
+            console.error("Erro ao resetar:", error);
+            updateStatusIndicator("error", "Falha ao resetar no servidor.");
+          }
         }
 
         function resetDataLocally() {
@@ -841,7 +901,7 @@
         reasonModal.addEventListener("click", closeReasonModal);
 
         // --- INICIALIZAÇÃO ---
-        loadState();
+        await loadState();
         updateAll();
       });
     </script>
