@@ -1,13 +1,12 @@
 // server.js
 
-// Importa os módulos necessários
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
 // --- CONFIGURAÇÃO ---
-const PORT = 8081; // Porta em que o servidor irá rodar. Pode ser alterada.
-const DATA_FILE = path.join(__dirname, "chamada_dados.json"); // Nome do arquivo para salvar os dados.
+const PORT = 8081; // Porta em que o servidor irá rodar
+const DATA_FILE = path.join(__dirname, "chamada_dados.json"); // Arquivo de dados
 
 // --- DADOS INICIAIS (caso o arquivo não exista) ---
 const initialCadets = [
@@ -63,8 +62,8 @@ const getInitialData = () => {
 
 // --- FUNÇÃO PARA LIDAR COM AS REQUISIÇÕES ---
 const requestListener = (req, res) => {
-  // Habilita o CORS para permitir que a página HTML acesse o servidor
-  res.setHeader("Access-Control-Allow-Origin", "*"); // Em produção, restrinja para o seu domínio
+  // Habilita o CORS para a API
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
@@ -75,11 +74,50 @@ const requestListener = (req, res) => {
     return;
   }
 
-  // Rota para obter os dados
-  if (req.url === "/api/data" && req.method === "GET") {
+  // 1. Servir arquivos estáticos (.js, .css, .png, .jpg, .ico)
+  if (
+    req.method === "GET" &&
+    (req.url.endsWith(".js") ||
+      req.url.endsWith(".css") ||
+      req.url.endsWith(".png") ||
+      req.url.endsWith(".jpg") ||
+      req.url.endsWith(".ico"))
+  ) {
+    const filePath = path.join(__dirname, req.url);
+    const ext = path.extname(req.url);
+    const mimeTypes = {
+      ".js": "application/javascript",
+      ".css": "text/css",
+      ".png": "image/png",
+      ".jpg": "image/jpeg",
+      ".ico": "image/x-icon",
+    };
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        res.writeHead(404);
+        res.end();
+      } else {
+        res.writeHead(200, { "Content-Type": mimeTypes[ext] || "text/plain" });
+        res.end(data);
+      }
+    });
+  }
+  // 2. Servir o index.html na raiz "/"
+  else if (req.url === "/" && req.method === "GET") {
+    fs.readFile(path.join(__dirname, "index.html"), (err, data) => {
+      if (err) {
+        res.writeHead(500, { "Content-Type": "text/plain" });
+        res.end("Erro ao carregar a página.");
+      } else {
+        res.writeHead(200, { "Content-Type": "text/html" });
+        res.end(data);
+      }
+    });
+  }
+  // 3. API: Obter dados
+  else if (req.url === "/api/data" && req.method === "GET") {
     fs.readFile(DATA_FILE, "utf8", (err, data) => {
       if (err) {
-        // Se o arquivo não existe, cria com os dados iniciais
         if (err.code === "ENOENT") {
           const initialData = getInitialData();
           fs.writeFile(
@@ -111,7 +149,7 @@ const requestListener = (req, res) => {
       }
     });
   }
-  // Rota para salvar os dados
+  // 4. API: Salvar dados
   else if (req.url === "/api/data" && req.method === "POST") {
     let body = "";
     req.on("data", (chunk) => {
@@ -129,7 +167,7 @@ const requestListener = (req, res) => {
       });
     });
   }
-  // Rota para resetar os dados
+  // 5. API: Resetar dados
   else if (req.url === "/api/reset" && req.method === "POST") {
     const initialData = getInitialData();
     fs.writeFile(DATA_FILE, JSON.stringify(initialData, null, 2), (err) => {
@@ -144,7 +182,7 @@ const requestListener = (req, res) => {
       }
     });
   }
-  // Rota não encontrada
+  // 6. Rota não encontrada
   else {
     res.writeHead(404);
     res.end(JSON.stringify({ message: "Rota não encontrada." }));
@@ -155,7 +193,6 @@ const requestListener = (req, res) => {
 const server = http.createServer(requestListener);
 server.listen(PORT, () => {
   console.log(`Servidor da Chamada PMMG a rodar em http://localhost:${PORT}`);
-  // Verifica se o arquivo de dados existe, se não, cria.
   if (!fs.existsSync(DATA_FILE)) {
     console.log("Arquivo de dados não encontrado. A criar um novo...");
     fs.writeFileSync(DATA_FILE, JSON.stringify(getInitialData(), null, 2));
