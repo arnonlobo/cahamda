@@ -1,0 +1,719 @@
+{
+  "cadetData": [
+    {
+      "name": "ANA CAROLINA",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "VIEIRA",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "MEDINA",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "ARNON",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "BRUNO DANTAS",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "CARLOS LANA",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "NESTOR",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "DINEY",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "VICTOR",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "EDER MONTEIRO",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "SOARES",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "DORNELAS",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "EDUARDO DIAS",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "EDUARDO",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "MARQUES",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "FELIPE",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "AMORIM",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "OLIVEIRA LOPES",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "HELOYANA",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "IGOR",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "BARCELOS",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "RENATO",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "LEANDRO",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "LUAN",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "PAULO PIMENTA",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "OLIVEIRA COSTA",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "MAURO",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "NÚBIA",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "NAZARIO",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "HORTA",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "GUIMARÃES",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "FELICIA",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "SARA",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    },
+    {
+      "name": "LINHARES",
+      "rollCalls": {
+        "chamada": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "almoco": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "tarde": {
+          "status": "nao_preenchido",
+          "reason": ""
+        },
+        "liberacao": {
+          "status": "nao_preenchido",
+          "reason": ""
+        }
+      }
+    }
+  ],
+  "activeRollCall": "chamada"
+}

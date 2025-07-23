@@ -10,7 +10,6 @@
       rel="stylesheet"
     />
     <style>
-      /* Cores PMMG */
       :root {
         --pmmg-dark: #212529;
         --pmmg-gold: #c5a364;
@@ -46,7 +45,6 @@
         background-color: #e9ecef;
         border: 2px dashed #adb5bd;
       }
-      /* Estilos para o modo de alteração em lote */
       .batch-mode-controls {
         display: none;
       }
@@ -58,6 +56,10 @@
       }
       .batch-mode-active .cadet-checkbox {
         display: block;
+      }
+      .tab-button.active {
+        background-color: var(--pmmg-dark);
+        color: var(--pmmg-gold);
       }
     </style>
   </head>
@@ -83,7 +85,7 @@
     <!-- Resumo da Situação -->
     <div class="summary bg-gray-200 p-2 sm:p-4 sticky top-0 z-10 shadow-sm">
       <h2 class="text-lg sm:text-xl font-bold text-center mb-2">
-        Situação do Pelotão
+        Situação do Pelotão (<span id="active-rollcall-title">Manhã</span>)
       </h2>
       <div class="summary-grid text-center">
         <div>
@@ -147,20 +149,57 @@
     <div class="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
       <!-- Coluna da Lista de Cadetes -->
       <main id="main-content" class="lg:col-span-2">
-        <div class="flex flex-wrap gap-2 justify-end mb-2">
-          <button
-            id="mark-all-present-button"
-            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 text-sm rounded-md shadow-sm"
-          >
-            Marcar Todos em Forma
-          </button>
-          <button
-            id="batch-mode-button"
-            class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 text-sm rounded-md shadow-sm"
-          >
-            Alterar em Lote
-          </button>
+        <!-- SELETOR DE CHAMADA -->
+        <div
+          class="mb-4 bg-gray-300 rounded-lg p-1 flex justify-center space-x-1"
+          id="rollcall-selector"
+        >
+          <!-- Botões gerados por JS -->
         </div>
+
+        <div class="flex flex-wrap gap-2 justify-between items-center mb-2">
+          <!-- Controles de Cópia e Reset -->
+          <div class="flex items-center gap-2">
+            <button
+              id="reset-data-button"
+              class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 text-sm rounded-md shadow-sm"
+            >
+              Resetar
+            </button>
+            <div
+              id="copy-container"
+              class="flex items-center gap-1 bg-gray-100 p-1 rounded-md"
+            >
+              <span class="text-sm font-medium ml-1">Copiar de:</span>
+              <select
+                id="copy-from-select"
+                class="p-1 border border-gray-300 rounded-md text-sm"
+              ></select>
+              <button
+                id="copy-rollcall-button"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-2 text-sm rounded-md shadow-sm"
+              >
+                Copiar
+              </button>
+            </div>
+          </div>
+          <!-- Controles de Ação Rápida -->
+          <div class="flex flex-wrap gap-2 justify-end">
+            <button
+              id="mark-all-present-button"
+              class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 text-sm rounded-md shadow-sm"
+            >
+              Todos em Forma
+            </button>
+            <button
+              id="batch-mode-button"
+              class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 text-sm rounded-md shadow-sm"
+            >
+              Alterar em Lote
+            </button>
+          </div>
+        </div>
+
         <!-- Controles de Ação em Lote -->
         <div
           class="batch-mode-controls bg-blue-100 p-3 rounded-lg mb-2 items-center gap-2 flex-wrap"
@@ -213,9 +252,7 @@
           <h3 class="font-bold text-lg border-b pb-2 mb-3 text-center">
             Desenho do Pelotão em Forma
           </h3>
-          <div id="formation-drawing" class="flex flex-col items-center">
-            <!-- O desenho será gerado aqui -->
-          </div>
+          <div id="formation-drawing" class="flex flex-col items-center"></div>
           <p
             id="formation-summary"
             class="text-center text-sm text-gray-600 mt-3"
@@ -232,7 +269,7 @@
             class="w-full text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
             style="background-color: var(--pmmg-dark); color: var(--pmmg-gold)"
           >
-            Gerar Relatório do Dia
+            Gerar Relatório
           </button>
           <div
             id="report-output"
@@ -311,6 +348,15 @@
         const markAllPresentButton = document.getElementById(
           "mark-all-present-button"
         );
+        const rollcallSelector = document.getElementById("rollcall-selector");
+        const activeRollcallTitle = document.getElementById(
+          "active-rollcall-title"
+        );
+        const resetDataButton = document.getElementById("reset-data-button");
+        const copyFromSelect = document.getElementById("copy-from-select");
+        const copyRollcallButton = document.getElementById(
+          "copy-rollcall-button"
+        );
 
         // --- DADOS E ESTADO INICIAL ---
         const initialCadets = [
@@ -350,26 +396,122 @@
           "LINHARES",
         ];
 
-        let cadetData = initialCadets.map((name) => ({
-          name: name,
-          status: "nao_preenchido", // 'nao_preenchido', 'em_forma', 'fora_de_forma_apm', 'fora_de_forma_fora_apm', 'audiencia'
-          reason: "",
-        }));
+        const rollCallPeriods = {
+          chamada: "Manhã",
+          almoco: "Almoço",
+          tarde: "Tarde",
+          liberacao: "Liberação",
+        };
+        const statusConfig = {
+          nao_preenchido: { text: "Não Preenchido", color: "gray" },
+          em_forma: { text: "Em Forma", color: "green" },
+          fora_de_forma_apm: { text: "Fora (APM)", color: "yellow" },
+          fora_de_forma_fora_apm: { text: "Fora (Fora)", color: "purple" },
+          audiencia: { text: "Audiência", color: "indigo" },
+        };
 
+        let cadetData = [];
+        let activeRollCall = "chamada";
         let currentEditingIndex = -1;
-        let currentStatusToSet = "";
+
+        // --- FUNÇÕES DE PERSISTÊNCIA (localStorage) ---
+        function saveState() {
+          try {
+            localStorage.setItem(
+              "pmm_charlie_rollcall",
+              JSON.stringify({ cadetData, activeRollCall })
+            );
+          } catch (error) {
+            console.error("Erro ao salvar no localStorage:", error);
+          }
+        }
+
+        function loadState() {
+          const savedState = localStorage.getItem("pmm_charlie_rollcall");
+          if (savedState) {
+            try {
+              const state = JSON.parse(savedState);
+              if (state && state.cadetData && Array.isArray(state.cadetData)) {
+                cadetData = state.cadetData;
+                activeRollCall = state.activeRollCall || "chamada";
+              } else {
+                resetDataLocally();
+              }
+            } catch (error) {
+              console.error(
+                "Erro ao processar dados do localStorage, resetando para o padrão.",
+                error
+              );
+              resetDataLocally();
+            }
+          } else {
+            resetDataLocally();
+          }
+        }
+
+        function resetData() {
+          // A função confirm() pode ser bloqueada, então o reset é direto.
+          localStorage.removeItem("pmm_charlie_rollcall");
+          loadState();
+          updateAll();
+        }
+
+        function resetDataLocally() {
+          cadetData = initialCadets.map((name) => ({
+            name: name,
+            rollCalls: {
+              chamada: { status: "nao_preenchido", reason: "" },
+              almoco: { status: "nao_preenchido", reason: "" },
+              tarde: { status: "nao_preenchido", reason: "" },
+              liberacao: { status: "nao_preenchido", reason: "" },
+            },
+          }));
+          activeRollCall = "chamada";
+        }
 
         // --- FUNÇÕES DE ATUALIZAÇÃO E RENDERIZAÇÃO ---
-
         function updateAll() {
+          renderRollCallSelector();
           updateCounters();
           renderCadetList();
           renderFormation();
+          saveState();
+        }
+
+        function renderRollCallSelector() {
+          rollcallSelector.innerHTML = "";
+          copyFromSelect.innerHTML = "";
+          activeRollcallTitle.textContent = rollCallPeriods[activeRollCall];
+
+          for (const key in rollCallPeriods) {
+            const btn = document.createElement("button");
+            btn.dataset.key = key;
+            btn.textContent = rollCallPeriods[key];
+            btn.className = `tab-button flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors ${
+              activeRollCall === key
+                ? "active"
+                : "bg-white hover:bg-gray-100 text-gray-700"
+            }`;
+            btn.onclick = () => {
+              activeRollCall = key;
+              updateAll();
+            };
+            rollcallSelector.appendChild(btn);
+
+            if (key !== activeRollCall) {
+              const option = document.createElement("option");
+              option.value = key;
+              option.textContent = rollCallPeriods[key];
+              copyFromSelect.appendChild(option);
+            }
+          }
         }
 
         function updateCounters() {
+          if (!cadetData || cadetData.length === 0) return;
           const counts = cadetData.reduce((acc, cadet) => {
-            acc[cadet.status] = (acc[cadet.status] || 0) + 1;
+            const status = cadet.rollCalls[activeRollCall].status;
+            acc[status] = (acc[status] || 0) + 1;
             return acc;
           }, {});
 
@@ -389,7 +531,9 @@
 
         function renderCadetList() {
           listElement.innerHTML = "";
+          if (!cadetData || cadetData.length === 0) return;
           cadetData.forEach((cadet, index) => {
+            const currentRollCall = cadet.rollCalls[activeRollCall];
             const listItem = document.createElement("li");
             listItem.className =
               "flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 border-b border-gray-200 last:border-b-0 hover:bg-gray-50";
@@ -411,10 +555,10 @@
             nameSpan.textContent = `${index + 1}. ${cadet.name}`;
             nameDiv.appendChild(nameSpan);
 
-            if (cadet.reason) {
+            if (currentRollCall.reason) {
               const reasonP = document.createElement("p");
               reasonP.className = "text-xs text-gray-500 mt-1 italic";
-              reasonP.textContent = `Motivo: ${cadet.reason}`;
+              reasonP.textContent = `Motivo: ${currentRollCall.reason}`;
               nameDiv.appendChild(reasonP);
             }
             leftSide.appendChild(nameDiv);
@@ -423,31 +567,19 @@
             controlsDiv.className =
               "flex items-center space-x-1 flex-shrink-0 flex-wrap gap-y-1";
 
-            const statuses = [
-              { id: "nao_preenchido", text: "Não Preenchido", color: "gray" },
-              { id: "em_forma", text: "Em Forma", color: "green" },
-              { id: "fora_de_forma_apm", text: "Fora (APM)", color: "yellow" },
-              {
-                id: "fora_de_forma_fora_apm",
-                text: "Fora (Fora)",
-                color: "purple",
-              },
-              { id: "audiencia", text: "Audiência", color: "indigo" },
-            ];
-
-            statuses.forEach((s) => {
+            for (const statusId in statusConfig) {
+              const s = statusConfig[statusId];
               const btn = document.createElement("button");
-              const isActive = cadet.status === s.id;
+              const isActive = currentRollCall.status === statusId;
               btn.textContent = s.text;
-              // Botões mais compactos
               btn.className = `text-xs font-semibold py-1 px-2 rounded-md transition-colors shadow-sm ${
                 isActive
                   ? `bg-${s.color}-600 text-white`
                   : "bg-gray-200 hover:bg-gray-300 text-gray-700"
               }`;
-              btn.onclick = () => changeStatus(index, s.id);
+              btn.onclick = () => changeStatus(index, statusId);
               controlsDiv.appendChild(btn);
-            });
+            }
 
             listItem.appendChild(leftSide);
             listItem.appendChild(controlsDiv);
@@ -461,20 +593,23 @@
             "fora_de_forma_fora_apm",
             "audiencia",
           ];
-          cadetData[index].status = newStatus;
+          const currentCadetRollCall =
+            cadetData[index].rollCalls[activeRollCall];
+          currentCadetRollCall.status = newStatus;
 
           if (needsReason.includes(newStatus)) {
-            openReasonModal(index, newStatus);
+            openReasonModal(index);
           } else {
-            cadetData[index].reason = "";
+            currentCadetRollCall.reason = "";
             updateAll();
           }
         }
 
         function renderFormation() {
           formationDrawing.innerHTML = "";
+          if (!cadetData || cadetData.length === 0) return;
           const numPresentes = cadetData.filter(
-            (c) => c.status === "em_forma"
+            (c) => c.rollCalls[activeRollCall].status === "em_forma"
           ).length;
 
           if (numPresentes === 0) {
@@ -510,27 +645,26 @@
                 cadetesRestantes > 0
                   ? Math.ceil(cadetesRestantes / (numColunas - i))
                   : 0;
-
               for (let j = 0; j < numLinhas; j++) {
                 const dot = document.createElement("div");
-                if (j < cadetesNestaColuna) {
-                  dot.className = "formation-dot";
-                } else {
-                  dot.className = "formation-placeholder";
-                }
+                dot.className =
+                  j < cadetesNestaColuna
+                    ? "formation-dot"
+                    : "formation-placeholder";
                 colDiv.appendChild(dot);
               }
               cadetesRestantes -= cadetesNestaColuna;
               platoonContainer.appendChild(colDiv);
             }
 
-            const cadetesUltimaLinha = numPelotao % numColunas;
+            const cadetesUltimaLinha =
+              numPelotao % numColunas || (numPelotao > 0 ? numColunas : 0);
             const retaguardaCompleta =
-              cadetesUltimaLinha === 0 || numLinhas === 1;
+              numPelotao > 0 &&
+              (numPelotao % numColunas === 0 || numLinhas === 1);
             const textoRetaguarda = retaguardaCompleta
               ? "completa"
               : `com ${cadetesUltimaLinha} cadete(s)`;
-
             formationSummary.textContent = `Xerife à frente. Pelotão com ${numLinhas} linha(s). Retaguarda ${textoRetaguarda}.`;
           } else if (temXerife) {
             formationSummary.textContent = "Apenas o Xerife está em forma.";
@@ -538,38 +672,39 @@
         }
 
         // --- MODAIS ---
-        function openReasonModal(index, status) {
+        function openReasonModal(index) {
           currentEditingIndex = index;
-          currentStatusToSet = status;
           reasonCadetName.textContent = cadetData[index].name;
-          reasonInput.value = "";
+          reasonInput.value = cadetData[index].rollCalls[activeRollCall].reason;
           reasonModal.classList.remove("hidden");
+          reasonInput.focus();
         }
 
         window.closeReasonModal = function () {
           reasonModal.classList.add("hidden");
-          if (
-            currentEditingIndex > -1 &&
-            !cadetData[currentEditingIndex].reason
-          ) {
-            cadetData[currentEditingIndex].status = "nao_preenchido";
+          if (currentEditingIndex > -1) {
+            const cadetRollCall =
+              cadetData[currentEditingIndex].rollCalls[activeRollCall];
+            if (!cadetRollCall.reason) {
+              cadetRollCall.status = "nao_preenchido";
+            }
+            updateAll();
           }
-          updateAll();
         };
 
         function saveReason() {
           if (currentEditingIndex > -1) {
-            cadetData[currentEditingIndex].status = currentStatusToSet;
-            cadetData[currentEditingIndex].reason = reasonInput.value;
+            cadetData[currentEditingIndex].rollCalls[activeRollCall].reason =
+              reasonInput.value;
             reasonModal.classList.add("hidden");
             updateAll();
           }
         }
 
-        // --- GERAÇÃO DE RELATÓRIO LOCAL ---
+        // --- GERAÇÃO DE RELATÓRIO ---
         function generateReport() {
           const presentCount = cadetData.filter(
-            (c) => c.status === "em_forma"
+            (c) => c.rollCalls[activeRollCall].status === "em_forma"
           ).length;
           const lists = {
             fora_de_forma_apm: [],
@@ -578,24 +713,25 @@
           };
 
           cadetData.forEach((cadet) => {
-            if (lists[cadet.status]) {
-              lists[cadet.status].push({
+            const currentRollCall = cadet.rollCalls[activeRollCall];
+            if (lists.hasOwnProperty(currentRollCall.status)) {
+              lists[currentRollCall.status].push({
                 name: cadet.name,
-                reason: cadet.reason,
+                reason: currentRollCall.reason || "Motivo não especificado",
               });
             }
           });
 
-          let reportString = `➖➖ CFO2 C ➖➖\n`;
+          let reportString = `➖➖ *CFO2 C* ➖➖\n`;
           reportString += `◼Previstos: ${cadetData.length}\n`;
           reportString += `◼Presentes: ${presentCount}\n`;
 
-          function formatList(title, category, showCount = true) {
-            let section = showCount
-              ? `${title}: ${lists[category].length}\n`
-              : `${title}\n`;
-            if (lists[category].length > 0) {
-              lists[category].forEach((cadet, index) => {
+          function formatCategory(title, categoryKey) {
+            const list = lists[categoryKey];
+            let section = "";
+            if (list.length > 0) {
+              section += `${title}: ${list.length}\n`;
+              list.forEach((cadet, index) => {
                 section += `${index + 1} - CAD PM ${cadet.name} (${
                   cadet.reason
                 })\n`;
@@ -604,15 +740,30 @@
             return section;
           }
 
-          reportString += formatList(
+          reportString += formatCategory(
             "◼Fora de forma (na APM)",
             "fora_de_forma_apm"
           );
-          reportString += formatList(
+          reportString += formatCategory(
             "◼Fora de forma (da APM)",
             "fora_de_forma_fora_apm"
           );
-          reportString += formatList("* Audiências", "audiencia", false);
+
+          const audienceList = lists["audiencia"];
+          if (audienceList.length > 0) {
+            if (
+              lists.fora_de_forma_apm.length > 0 ||
+              lists.fora_de_forma_fora_apm.length > 0
+            ) {
+              reportString += "\n";
+            }
+            reportString += `* Audiências:\n`;
+            audienceList.forEach((cadet, index) => {
+              reportString += `${index + 1} - CAD PM ${cadet.name} (${
+                cadet.reason
+              })\n`;
+            });
+          }
 
           reportContent.textContent = reportString.trim();
           reportOutput.classList.remove("hidden");
@@ -621,6 +772,22 @@
         // --- LÓGICA DE AÇÕES RÁPIDAS ---
         function toggleBatchMode() {
           mainContent.classList.toggle("batch-mode-active");
+          if (!mainContent.classList.contains("batch-mode-active")) {
+            document
+              .querySelectorAll(".cadet-checkbox:checked")
+              .forEach((cb) => (cb.checked = false));
+          }
+        }
+
+        function copyRollCall() {
+          const sourceKey = copyFromSelect.value;
+          if (!sourceKey) return;
+          cadetData.forEach((cadet) => {
+            cadet.rollCalls[activeRollCall] = JSON.parse(
+              JSON.stringify(cadet.rollCalls[sourceKey])
+            );
+          });
+          updateAll();
         }
 
         function applyBatchChange() {
@@ -630,15 +797,23 @@
             ".cadet-checkbox:checked"
           );
 
-          if (selectedCheckboxes.length === 0) {
-            alert("Por favor, selecione pelo menos um cadete.");
-            return;
-          }
+          if (selectedCheckboxes.length === 0) return;
 
           selectedCheckboxes.forEach((checkbox) => {
             const index = parseInt(checkbox.dataset.index, 10);
-            cadetData[index].status = newStatus;
-            cadetData[index].reason = newReason;
+            const cadetRollCall = cadetData[index].rollCalls[activeRollCall];
+            cadetRollCall.status = newStatus;
+            if (
+              [
+                "fora_de_forma_apm",
+                "fora_de_forma_fora_apm",
+                "audiencia",
+              ].includes(newStatus)
+            ) {
+              cadetRollCall.reason = newReason;
+            } else {
+              cadetRollCall.reason = "";
+            }
           });
 
           toggleBatchMode();
@@ -647,8 +822,9 @@
 
         function markAllInShape() {
           cadetData.forEach((cadet) => {
-            cadet.status = "em_forma";
-            cadet.reason = "";
+            const cadetRollCall = cadet.rollCalls[activeRollCall];
+            cadetRollCall.status = "em_forma";
+            cadetRollCall.reason = "";
           });
           updateAll();
         }
@@ -660,8 +836,12 @@
         cancelBatchButton.addEventListener("click", toggleBatchMode);
         applyBatchButton.addEventListener("click", applyBatchChange);
         markAllPresentButton.addEventListener("click", markAllInShape);
+        resetDataButton.addEventListener("click", resetData);
+        copyRollcallButton.addEventListener("click", copyRollCall);
+        reasonModal.addEventListener("click", closeReasonModal);
 
         // --- INICIALIZAÇÃO ---
+        loadState();
         updateAll();
       });
     </script>
